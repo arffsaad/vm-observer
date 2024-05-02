@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/segmentio/kafka-go"
@@ -12,12 +15,11 @@ import (
 )
 
 type DiskUsage struct {
-	Host   string         `json:"hostname"`
-	HostID string         `json: "hostID"`
-	Disk   map[string]int `json:"disk"` // Map for named disk usage
+	Host string            `json:"hostname"`
+	Disk map[string]uint64 `json:"disk"`
 }
 
-func updateUsage() {
+func updateUsage(server string, hostid string) {
 	host, err := os.Hostname()
 	if err != nil {
 		log.Fatal("Error retrieving hostname!", err)
@@ -29,9 +31,8 @@ func updateUsage() {
 	}
 
 	disk := &DiskUsage{
-		Host:   host,
-		HostID: "b2626db1-879f-478c-9e0b-56060e5d6912", // hardcoded, this will be set by installation bash script
-		Disk:   map[string]int{"total": int(usg.Total), "free": int(usg.Free), "used": int(usg.Used)},
+		Host: host,
+		Disk: map[string]uint64{"total": usg.Total, "free": usg.Free, "used": usg.Used},
 	}
 
 	usgData, err := json.Marshal(disk)
@@ -39,10 +40,10 @@ func updateUsage() {
 		log.Fatal("Unable to process usage statistics!", err)
 	}
 
-	topic := "deviceMetrics_someuuid-213123123-asdfasdvkj" // will also be set by bash script.
+	topic := "deviceMetrics_" + hostid // will also be set by bash script.
 	partition := 0
 
-	conn, err := kafka.DialLeader(context.Background(), "tcp", "localhost:9092", topic, partition)
+	conn, err := kafka.DialLeader(context.Background(), "tcp", server, topic, partition)
 	if err != nil {
 		log.Fatal("Failed to dial leader:", err)
 	}
@@ -61,13 +62,34 @@ func updateUsage() {
 }
 
 func main() {
-	ticker := time.NewTicker(time.Minute)
+	if len(os.Args) < 2 {
+		panic("Not enough arguments! Usage: ./collector-agent <connectionString>")
+	}
+	connectionString := os.Args[1]
+	decodedBytes, err := base64.StdEncoding.DecodeString(connectionString)
+	if err != nil {
+		log.Fatal("Error decoding connection string!", err)
+	}
+	connectionString = string(decodedBytes)
+	if !strings.Contains(connectionString, "|") {
+		log.Fatal("Invalid connection string!")
+	}
+	server := strings.Split(connectionString, "|")[0]
+	hostid := strings.Split(connectionString, "|")[1]
+
+	// DEBUG
+	fmt.Printf("server: %s\nhostid: %s\n", server, hostid)
+
+	// first contact
+	go updateUsage(server, hostid)
+
+	ticker := time.NewTicker(2 * time.Minute) // Update every 2mins
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			go updateUsage()
+			go updateUsage(server, hostid)
 		}
 	}
 }
