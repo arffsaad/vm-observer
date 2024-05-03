@@ -24,8 +24,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 
-Route::get('/dashboard', MainDashboard::class)->name('dashboard');
-
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
         ->name('login');
@@ -47,6 +45,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('password/confirm', Confirm::class)
         ->name('password.confirm');
+
+    Route::get('/dashboard', MainDashboard::class)->name('dashboard');
 });
 
 Route::middleware('auth')->group(function () {

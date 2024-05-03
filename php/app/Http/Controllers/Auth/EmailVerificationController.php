@@ -29,6 +29,6 @@ class EmailVerificationController extends Controller
             event(new Verified(Auth::user()));
         }
 
-        return redirect(route('home'));
+        return redirect(route('dashboard'));
     }
 }
