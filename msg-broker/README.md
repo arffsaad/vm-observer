@@ -45,9 +45,10 @@ collectorAgent user is only used by the golang app as a client to produce update
     sudo /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
     ```
 
-- Lastly, finish with setting up ACLs for the users
+- Lastly, finish with setting up ACLs for the users and create the topic
 
     ```
-    sudo /opt/kafka/bin/kafka-acls.sh --command-config /opt/kafka/config/superuser.properties --bootstrap-server localhost:9092 --add --allow-principal User:phpConsume --operation Read --topic deviceMetrics
-    sudo /opt/kafka/bin/kafka-acls.sh --command-config /opt/kafka/config/superuser.properties --bootstrap-server localhost:9092 --add --allow-principal User:collectorAgent --operation Write --topic deviceMetrics
+    sudo /opt/kafka/bin/kafka-topics.sh --command-config /opt/kafka/config/superuser.properties --create --topic deviceMetrics --bootstrap-server localhost:9092
+    sudo /opt/kafka/bin/kafka-acls.sh --command-config /opt/kafka/config/superuser.properties --bootstrap-server localhost:9092 --add --allow-principal User:phpConsumer --operation Read --topic deviceMetrics --group '*'
+    sudo /opt/kafka/bin/kafka-acls.sh --command-config /opt/kafka/config/superuser.properties --bootstrap-server localhost:9092 --add --allow-principal User:collectorAgent --operation Write --topic deviceMetrics --group '*'
     ```
