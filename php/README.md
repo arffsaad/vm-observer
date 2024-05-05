@@ -45,4 +45,11 @@ This application requires PHP8.2, PHP-rdkafka extension, sqlite3 extension and b
     user=your-user
     numprocs=1
     redirect_stderr=true
-    stdout_logfile=/var/log/laravel-kafka-consumer.log```
+    stdout_logfile=/var/log/laravel-kafka-consumer.log
+    ```
+
+    - Lastly, run the supervisor config using these commands
+    ```sudo supervisorctl reread
+    sudo supervisorctl update
+    sudo supervisorctl start laravel-kafka-consumer:*
+    ```
