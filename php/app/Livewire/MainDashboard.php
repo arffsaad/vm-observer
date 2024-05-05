@@ -38,19 +38,14 @@ class MainDashboard extends Component
             $new->save();
         }
 
-        // the server is preconfigured to be allowed to create a new topic for this device. Produce an intro msg to init the topic
-        $topic = env("KAFKA_TOPIC_PREFIX", "deviceMetrics_") . $new->id;
-        $producer = Kafka::publish('broker')->onTopic($topic);
-        $producer->send();
-
-        // hash both kafkaserver and hostid into b64
-        $hashData = env("KAFKA_BROKERS", "localhost:9092") . "|" . $new->id;
+        // hash kafkaserver, hostid, user, and password into b64
+        $hashData = env("KAFKA_COLLECTOR_SERVER", "localhost:9092") . "|" . $new->id . "|" . env("KAFKA_COLLECTOR_USER", "user") . "|" . env("KAFKA_COLLECTOR_PASSWORD", "password");
         $hashed = base64_encode($hashData);
 
         $this->onboarding = true;
         $this->onboardID = $new->id;
 
-        $this->installCmd = "wget somescript.sh | sh $hashed";
+        $this->installCmd = "curl -s " . env("APP_URL") . "/installer | bash -s $hashed";
     }
 
     public function refreshList() {

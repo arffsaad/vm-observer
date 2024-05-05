@@ -28,8 +28,14 @@ class SubscribeTopic extends Command
     public function handle()
     {
         $consumer = Kafka::consumer()
-        ->subscribe('^deviceMetrics_.*')
+        ->subscribe('deviceMetrics')
         ->withHandler(new KafkaController)
+        ->withSasl(
+            password: env("KAFKA_CONSUMER_PASSWORD", "password"),
+            username: env("KAFKA_CONSUMER_USER", "username"),
+            mechanisms: env("KAFKA_SECURITY_MECHANISM", "SCRAM-SHA-256"),
+            securityProtocol: env("KAFKA_SECURITY_PROTOCOL", "SASL_SSL"),
+        )
         ->build();
 
         $consumer->consume();

@@ -24,6 +24,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 
+Route::get('installer', function () {
+    $file_path = public_path('install.sh');
+    if (file_exists($file_path))
+    {
+        return Response::download($file_path);
+    }
+    else
+    {
+        exit('Requested file does not exist on our server!');
+    }
+});
+
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
         ->name('login');
