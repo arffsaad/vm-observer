@@ -18,7 +18,7 @@ import (
 
 type DiskUsage struct {
 	Host   string            `json:"hostname"`
-	Hostid string            `json:hostId`
+	Hostid string            `json:"hostId"`
 	Disk   map[string]uint64 `json:"disk"`
 }
 
