@@ -40,7 +40,7 @@ This application requires PHP8.2, PHP-rdkafka extension, sqlite3 extension and b
     ```
     [program:laravel-kafka-consumer]
     process_name=%(program_name)s_%(process_num)02d
-    command=php /var/www/html/artisan queue:work
+    command=php /var/www/html/artisan app:subscribe-topic
     autostart=true
     autorestart=true
     user=your-user
