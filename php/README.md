@@ -37,7 +37,8 @@ This application requires PHP8.2, PHP-rdkafka extension, sqlite3 extension and b
 
     - You may use the below example config for supervisord
 
-    ```[program:laravel-kafka-consumer]
+    ```
+    [program:laravel-kafka-consumer]
     process_name=%(program_name)s_%(process_num)02d
     command=php /var/www/html/artisan queue:work
     autostart=true
@@ -49,7 +50,8 @@ This application requires PHP8.2, PHP-rdkafka extension, sqlite3 extension and b
     ```
 
     - Lastly, run the supervisor config using these commands
-    ```sudo supervisorctl reread
+    ```
+    sudo supervisorctl reread
     sudo supervisorctl update
     sudo supervisorctl start laravel-kafka-consumer:*
     ```
