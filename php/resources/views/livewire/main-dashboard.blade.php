@@ -12,12 +12,12 @@
             @if($devices)
                 @foreach($devices as $device)
                     @if($device->hostname != null)
-                    <div wire:key="device-{{ $device->id }}" wire:click="viewDevice({{ $device }})" class="rounded-lg bg-slate-100 w-full h-auto p-4 border justify-start font-bold items-center cursor-pointer hover:scale-[1.02] active:shadow-sm active:scale-[0.98] transition">
+                    <div wire:poll="refreshList" wire:key="device-{{ $device->id }}" wire:click="viewDevice({{ $device }})" class="rounded-lg bg-slate-100 w-full h-auto p-4 border justify-start font-bold items-center cursor-pointer hover:scale-[1.02] active:shadow-sm active:scale-[0.98] transition">
                         <div class="text-xl italic flex justify-between items-center">
                             <h1>{{ $device->hostname }}</h1>
                             <span class="relative flex h-3 w-3">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 @if(time() - strtotime($device->updated_at) >= 450) bg-red-400 @else bg-green-400 @endif"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 @if(time() - strtotime($device->updated_at) >= 450) bg-red-500 @else bg-green-500 @endif"></span>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 @if(time() - strtotime($device->updated_at) >= 150) bg-red-400 @else bg-green-400 @endif"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 @if(time() - strtotime($device->updated_at) >= 150) bg-red-500 @else bg-green-500 @endif"></span>
                             </span>
                         </div>
                         <h1 class="text-sm font-semibold">Used disk space: <span class="font-normal">{{ round((($device->disk_used / $device->disk_total) * 100), 2) }}%</span></h1>
@@ -61,21 +61,34 @@
                 </div>
             </div>
             @elseif($currentDevice)
-            <div class="grid grid-cols-2 border-b-2 pb-6">
+            <div wire:poll="pollDevice" class="grid grid-cols-2 border-b-2 pb-6">
                 <div class="justify-self-start font-bold text-2xl">
                     <x-fas-computer class="w-14 h-14"/>
                     <h2>{{$currentDevice['hostname']}}</h2>
                 </div>
                 <div class="justify-self-end flex items-center gap-x-2 self-start">
                     <span class="relative flex h-3 w-3">
-                        @if(!(time() - strtotime($currentDevice['updated_at']) >= 450))
+                        @if(!(time() - strtotime($currentDevice['updated_at']) >= 150))
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         @endif
-                        <span class="relative inline-flex rounded-full h-3 w-3 @if(time() - strtotime($currentDevice['updated_at']) >= 450) bg-red-500 @else bg-green-500 @endif"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 @if(time() - strtotime($currentDevice['updated_at']) >= 150) bg-red-500 @else bg-green-500 @endif"></span>
                       </span>
-                    <h2 class="text-md">{{ (time() - strtotime($currentDevice['updated_at']) >= 450) ? "Offline" : "Online" }}</h2>
+                    <h2 class="text-md">{{ (time() - strtotime($currentDevice['updated_at']) >= 150) ? "Offline" : "Online" }}</h2>
                 </div>
-                <h3 class="text-sm italic">Last update received on: {{ date("Y-m-d H:i", strtotime($currentDevice['updated_at'])) }}</h3>
+                <h3 class="text-sm italic">Last update received 
+                    @php 
+                    $last_ping = new DateTime($currentDevice['updated_at']);
+                    $time_diff = $last_ping->diff(new DateTime());
+                    if ($time_diff->i < 2) {
+                        echo "less than a minute";
+                    } else {
+                        echo ($time_diff->d > 0) ? $time_diff->d . " days and " : "";
+                        echo ($time_diff->h > 0) ? $time_diff->h . " hours and " : ""; 
+                        echo $time_diff->i . " minutes " ;
+                    }
+                    echo " ago";
+                    @endphp
+                </h3>
             </div>
             <div class="grid grid-cols-[1fr_6fr] h-full w-full">
                 <div class="h-full w-full border-r-2 grid grid-cols-1 grid-rows-8">
@@ -97,11 +110,9 @@
                     </div>
                     <div class="w-full h-full flex justify-center items-center px-8">
                         <div class="relative h-10 w-full bg-slate-200 rounded-xl">
-                            @if($currentDevice)
                             <div class="absolute h-full w-[5%] bg-gradient-to-r from-green-300 to-green-800 rounded-xl flex justify-end items-center font-bold overflow-x-hidden">
                             </div>
                             <p class="absolute p-2 font-bold text-black">{{ round((($currentDevice['disk_used'] / $currentDevice['disk_total']) * 100), 2) }}%</p>
-                            @endif
                         </div>
                     </div>
                 </div>

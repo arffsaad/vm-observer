@@ -76,7 +76,11 @@ class MainDashboard extends Component
         $this->contentLoading = false;
     }
 
-    // public function pollDevice() {
-
-    // }
+    public function pollDevice() {
+        $this->contentLoading = true;
+        $deviceID = $this->currentDevice['id'];
+        $this->currentDevice = null;
+        $this->currentDevice = Device::find($deviceID)->toArray();
+        $this->contentLoading = false;
+    }   
 }
