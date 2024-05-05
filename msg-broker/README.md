@@ -22,7 +22,7 @@ collectorAgent user is only used by the golang app as a client to produce update
 - Start the Zookeper server.
 
     ```
-    ./opt/kafka/bin/zookeeper-server-start.sh config/zookeeper.properties
+    sudo /opt/kafka/bin/zookeeper-server-start.sh /opt/kafka/config/zookeeper.properties
     ```
 
 - On another terminal, pass the JAAS config to the JVM by running 
@@ -34,20 +34,20 @@ collectorAgent user is only used by the golang app as a client to produce update
 - Next, Create the users by running these commands
 
     ```
-    sudo ./opt/kafka/bin/kafka-configs.sh --zookeeper localhost:2181 --alter --add-config 'SCRAM-SHA-512=[password='superadmin']' --entity-type users --entity-name superadmin
-    sudo ./opt/kafka/bin/kafka-configs.sh --zookeeper localhost:2181 --alter --add-config 'SCRAM-SHA-512=[password='consume123!']' --entity-type users --entity-name phpConsumer
-    sudo ./opt/kafka/bin/kafka-configs.sh --zookeeper localhost:2181 --alter --add-config 'SCRAM-SHA-512=[password='collect123!']' --entity-type users --entity-name collectorAgent
+    sudo /opt/kafka/bin/kafka-configs.sh --zookeeper localhost:2181 --alter --add-config 'SCRAM-SHA-512=[password='superadmin']' --entity-type users --entity-name superadmin
+    sudo /opt/kafka/bin/kafka-configs.sh --zookeeper localhost:2181 --alter --add-config 'SCRAM-SHA-512=[password=consume123!]' --entity-type users --entity-name phpConsumer
+    sudo /opt/kafka/bin/kafka-configs.sh --zookeeper localhost:2181 --alter --add-config 'SCRAM-SHA-512=[password=collect123!]' --entity-type users --entity-name collectorAgent
     ```
 
 - Start Kafka server using 
     
     ```
-    bin/kafka-server-start.sh config/server.properties
+    sudo /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
     ```
 
 - Lastly, finish with setting up ACLs for the users
 
     ```
-    sudo ./opt/kafka/bin/kafka-acls.sh --command-config config/superadmin.properties --bootstrap-server localhost:9092 --add --allow-principal User:phpConsume --operation Read --topic deviceMetrics
-    sudo ./opt/kafka/bin/kafka-acls.sh --command-config config/superadmin.properties --bootstrap-server localhost:9092 --add --allow-principal User:collectorAgent --operation Write --topic deviceMetrics
+    sudo /opt/kafka/bin/kafka-acls.sh --command-config /opt/kafka/config/superuser.properties --bootstrap-server localhost:9092 --add --allow-principal User:phpConsume --operation Read --topic deviceMetrics
+    sudo /opt/kafka/bin/kafka-acls.sh --command-config /opt/kafka/config/superuser.properties --bootstrap-server localhost:9092 --add --allow-principal User:collectorAgent --operation Write --topic deviceMetrics
     ```
