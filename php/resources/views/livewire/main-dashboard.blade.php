@@ -110,7 +110,7 @@
                     </div>
                     <div class="w-full h-full flex justify-center items-center px-8">
                         <div class="relative h-10 w-full bg-slate-200 rounded-xl">
-                            <div class="absolute h-full w-[5%] bg-gradient-to-r from-green-300 to-green-800 rounded-xl flex justify-end items-center font-bold overflow-x-hidden">
+                            <div class="absolute h-full w-[{{ round((($currentDevice['disk_used'] / $currentDevice['disk_total']) * 100), 2) }}] bg-gradient-to-r from-green-300 to-green-800 rounded-xl flex justify-end items-center font-bold overflow-x-hidden">
                             </div>
                             <p class="absolute p-2 font-bold text-black">{{ round((($currentDevice['disk_used'] / $currentDevice['disk_total']) * 100), 2) }}%</p>
                         </div>
