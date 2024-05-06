@@ -8,6 +8,9 @@ module.exports = {
             },
         },
     },
+    safelist: [
+        ...[...Array(100).keys()].flatMap(i => [`w-[${i}%]`])
+    ],
     variants: {
         extend: {
             backgroundColor: ['active'],
