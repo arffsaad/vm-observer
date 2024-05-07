@@ -16,5 +16,7 @@ This application is currently locked to use SASL_SSL and the SCRAM_SHA_256 mecha
 
 To run, simply build/install and pass the connection string as an argument.
 
-`go build`
-`./collector-agent <connectionstring>`
+```
+go build
+./collector-agent <connectionstring>
+```
