@@ -10,7 +10,7 @@ class KafkaController extends Controller
         $data = $message->getBody();
         if (isset($data['hostname']) && isset($data['hostId']))
         {
-            $hostid = $data['hostname'];
+            $hostid = $data['hostId'];
             $device = Device::find($hostid);
             $device->hostname = $data['hostname'];
             $device->disk_total = $data['disk']['total'];
